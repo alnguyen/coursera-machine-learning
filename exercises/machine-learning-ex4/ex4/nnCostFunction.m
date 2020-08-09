@@ -62,23 +62,59 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+%%%% Part 1:
 
+a1 = [ones(m, 1) X]; % layer 1 with bias
 
+z2 = a1 * Theta1';
+a2 = sigmoid(z2); % layer 2
+a2 = [ones(m, 1) a2]; % Add bias 1
 
+z3 = a2 * Theta2';
+a3 = sigmoid(z3); % layer 3, also h_theta
 
+yVec = zeros(m, num_labels);
 
+for i = 1:m
+    yVec(i, y(i)) = 1;
+endfor
 
+J = (1 / m) * sum(sum( -yVec .* log(a3) - (1 - yVec) .* log(1 - a3) ));
 
+% Regularization
+regTheta1 = Theta1(:, 2:end);
+regTheta2 = Theta2(:, 2:end);
 
+reg = lambda/(2 * m) * (sum(sum( regTheta1.^2)) + sum(sum(regTheta2.^2)));
 
+J = J + reg;
 
+%%%% Part 2:
 
+for i = 1:m
+  a1 = [1; X(i, :)']; % l = 1
+  
+  z2 = Theta1 * a1;
+  a2 = [1; sigmoid(z2)]; % l = 2
+  
+  z3 = Theta2 * a2;
+  a3 = sigmoid(z3);
+  
+  d3 = a3 - ([1:num_labels]==y(i))';
+  
+  d2 = (Theta2' * d3) .* [1; sigmoidGradient(z2)];
+  d2 = d2(2:end); % account for bias
+  
+  Theta1_grad = Theta1_grad + d2 * a1';
+  Theta2_grad = Theta2_grad + d3 * a2';
+endfor
 
+% Part 3:
+regTheta1 = (lambda/m) * [zeros(size(Theta1, 1), 1) Theta1(:,2:end)];
+regTheta2 = (lambda/m) * [zeros(size(Theta2, 1), 1) Theta2(:,2:end)];
 
-
-
-
-
+Theta1_grad = (1 / m) * Theta1_grad + regTheta1;
+Theta2_grad = (1 / m) * Theta2_grad + regTheta2;
 
 % -------------------------------------------------------------
 
