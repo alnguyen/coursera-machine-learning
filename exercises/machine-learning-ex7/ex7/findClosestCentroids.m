@@ -22,7 +22,19 @@ idx = zeros(size(X,1), 1);
 %
 
 
-
+for i = 1:size(X, 1)
+  d_vec = zeros(1, K);
+  
+  for j = 1:K
+    d_vec(1, j) = sqrt(
+      sum(
+        power((X(i,:) - centroids(j,:)), 2)
+      )
+    );
+  endfor
+  [~, d_idx] = min(d_vec);
+  idx(i, 1) = d_idx;
+endfor
 
 
 
